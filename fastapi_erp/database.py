@@ -49,7 +49,7 @@ def set_fields_from_dict(obj, data: dict):
 
 load_dotenv()
 
-__DB_URL = os.getenv("DB_URL")
+__DB_URL = os.getenv("DATABASE_URL")
 
 __engine = create_engine(__DB_URL)
 

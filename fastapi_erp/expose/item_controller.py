@@ -4,7 +4,7 @@ from fastapi_erp.business.item_service import ItemService
 from fastapi_erp.cbv import cbv
 from fastapi_erp.model.api.item import Item, ItemCreate
 
-router = APIRouter(prefix="/api/item", tags= ["Items"])
+router = APIRouter(prefix="/item", tags= ["Items"])
 
 userService = UserService()
 

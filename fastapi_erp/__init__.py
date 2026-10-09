@@ -4,7 +4,9 @@ from fastapi import FastAPI, Request
 from fastapi_erp.expose.item_controller import router as item_router
 from fastapi_erp.expose.book_controller import router as book_router
 import logging
+
 logging.basicConfig()
+
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
 app = FastAPI(
