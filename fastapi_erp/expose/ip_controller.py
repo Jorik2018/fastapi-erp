@@ -242,10 +242,10 @@ class IpController:
             if value is not None
         }
 
-        data = await self.ip_service.list(
-            skip=skip,
-            limit=limit,
-            params=params,
+        data = self.ip_service.load(
+            first=skip,
+            page_size=limit,
+            filters=params,
         )
 
         return {
