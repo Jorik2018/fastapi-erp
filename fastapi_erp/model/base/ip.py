@@ -13,7 +13,12 @@ class UtiIp(Base):
 
     __tablename__ = "uti_ip"
 
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+        autoincrement=True,
+    )
 
     category = Column(String(145))
     code = Column(String(145))
@@ -77,6 +82,3 @@ class UtiIp(Base):
     activation_date = Column(DateTime)
 
     ext = None
-
-    def dict(self):
-        return self.__dict__
