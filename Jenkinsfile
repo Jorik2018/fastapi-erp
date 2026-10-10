@@ -8,11 +8,11 @@ pipeline {
     }
 
     environment {
-        SERVICE_ID = 'fastapi-erp'
-        SERVICE_NAME = 'FastAPI ERP'
+        SERVICE_ID = 'fastapi-erp-api'
+        SERVICE_NAME = 'FastAPI ERP API'
         SERVICE_DESCRIPTION = 'FastAPI ERP Application'
 
-        DEPLOY_DIR = 'D:\\apps\\fastapi-erp'
+        DEPLOY_DIR = 'D:\\microservices\\fastapi-erp-api'
 
         PORT = '7785'
         VAULT_PATH = '/global'
