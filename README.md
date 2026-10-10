@@ -60,3 +60,7 @@ async def add_process_time_header(request: Request, call_next):
 #         finally:
 #             db.close()
 #     return response
+
+
+
+MOCK_VAULT=true poetry run uvicorn fastapi_erp:app --reload

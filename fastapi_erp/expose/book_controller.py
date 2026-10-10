@@ -4,7 +4,7 @@ from fastapi_erp.cbv import cbv
 from fastapi_erp.business.book_service import BookService
 from fastapi_erp.model.api.book import BookSchema, Response
 
-router = APIRouter(prefix="/api/book")
+router = APIRouter(prefix="/book")
 
 # Cabe mencionar que vamos a usar constantemente dos parametros 
 # "request" el cual es la entrada y será acorde con el esquema "mostrar en SWAGGER"

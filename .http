@@ -1,0 +1,10 @@
+@vaultHost = http://127.0.0.1:8000
+@server = http://127.0.0.1:8000
+@vaultToken = test-token
+
+@jwtToken = eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL2V4YW1wbGUuY29tL2lzc3VlciIsInVwbiI6Impkb2VAcXVhcmt1cy5pbyIsImdyb3VwcyI6WyJVc2VyIiwiQWRtaW4iXSwianRpIjoiYmFlNTFjY2UtNWM1ZS00YTZiLTk1YTgtNDU1N2Y5NTQxNGNkIiwidWlkIjoxLCJ1c2VyIjoiWERtZXIxNF8vby8iLCJiaXJ0aGRhdGUiOiIyMDAxLTA3LTEzIiwiaWF0IjoxNzkxNTk5MzY2LCJleHAiOjE3OTE2MDI5NjZ9.k-NP5uVXOt8dDeC8HB71wUs54I2dbEcGGynutzzXE4h0EH5Zp02IiHZ74a6RlyiKWfL0_O0WlS_vS-6GekXbBOGt2tZ8FQbNVTHH4_AQeYKidukfZmQPOH5ZZ04H-4EOA-Lt8Rn-iUbKIB4DMq9ceUFHgXQsDCE2_TIxPIK-98zQxQtpWzeaSR-LARaGT_s8Vt0AxGR1vp5W4EQ5HPZKg5rCPeHY0tDu5fDfpwsBDVYXW7pyuJzJOaD5dpf7-8qr3enWuZtqSAQNI8k93n0uvMS0An1XPe8_XqesekQbiZARg8bi5VKLFNB-x7bCdhtiBrXVVoeepg22reI0QK1QtQ
+
+### Books con JWT
+GET {{server}}/book/0/100
+Authorization: Bearer {{jwtToken}}
+Accept: application/json
