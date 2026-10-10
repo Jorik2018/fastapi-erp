@@ -370,10 +370,6 @@ class IpService:
                 UtiIp.code.desc(),
             )
 
-        # ---------------------------------------------------------
-        # PAGINACIÓN
-        # ---------------------------------------------------------
-
         if page_size > 0:
             query = (
                 query
@@ -383,23 +379,16 @@ class IpService:
 
         rows = query.all()
 
-        # ---------------------------------------------------------
-        # RESULTADO
-        #
-        # Java:
-        # SELECT o, s.fullName
-        # ---------------------------------------------------------
+        result = []
 
-        return [
-            {
-                "item": item,
-                "fullName": full_name,
+        for item, full_name in rows:
+            item.ext = {
+                "fullName": full_name
             }
-            for item, full_name in rows
-        ]
-    # ---------------------------------------------------------
-    # CREATE / EDIT
-    # ---------------------------------------------------------
+
+            result.append(item)
+
+        return rows
 
     async def edit(self, entity: UtiIp, user=None):
         if entity.code is not None:
