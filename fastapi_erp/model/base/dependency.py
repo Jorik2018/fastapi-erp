@@ -23,7 +23,7 @@ class Dependency(Base):
     type_id = Column(
         "id_dep_tipo",
         Integer,
-        ForeignKey("org_dependencia_tipo.id_dep_tipo"),
+        ForeignKey("org_dep_tipo.id_dep_tipo"),
         nullable=False
     )
 
