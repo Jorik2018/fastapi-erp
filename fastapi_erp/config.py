@@ -11,7 +11,7 @@ def _get_vault_secret(path: str) -> dict:
     return get_vault_secret(path)
 
 def get_database_url() -> str:
-    database_url = _get_vault_secret(VAULT_GLOBAL_PATH).get("POSTGRES_URL")#DATABASE_URL
+    database_url = _get_vault_secret(VAULT_GLOBAL_PATH).get("MYSQL_URL")#DATABASE_URL
     if not database_url:
         raise RuntimeError(
             "DATABASE_URL is not configured in Vault"

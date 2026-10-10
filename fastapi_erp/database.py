@@ -70,7 +70,7 @@ def get_sessionmaker():
 
         __engine = create_engine(database_url)
 
-        Base.metadata.create_all(bind=__engine)
+        #Base.metadata.create_all(bind=__engine)
 
         __sessionmaker = sessionmaker(
             autocommit=False,
