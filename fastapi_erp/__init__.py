@@ -18,6 +18,7 @@ app = FastAPI(
 #from fastapi_erp.database import DBMiddleware
 from fastapi_erp.expose.item_controller import router as item_router
 from fastapi_erp.expose.book_controller import router as book_router
+from fastapi_erp.expose.ip_controller import router as ip_router
 
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
@@ -29,4 +30,5 @@ async def add_process_time_header(request: Request, call_next):
 #app.add_middleware(DBMiddleware, some_attribute="some_attribute_here_if_needed")
 app.add_middleware(JWTMiddleware)
 app.include_router(item_router)
+app.include_router(ip_router)
 app.include_router(book_router, tags= ["Book","Libro"])
