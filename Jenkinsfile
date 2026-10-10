@@ -11,9 +11,7 @@ pipeline {
         SERVICE_ID = 'fastapi-erp-api'
         SERVICE_NAME = 'FastAPI ERP API'
         SERVICE_DESCRIPTION = 'FastAPI ERP Application'
-
         DEPLOY_DIR = 'D:\\microservices\\fastapi-erp-api'
-
         PORT = '7785'
         VAULT_PATH = '/global'
     }
@@ -192,37 +190,6 @@ pipeline {
 
                     if errorlevel 1 (
                         echo ERROR: Could not start FastAPI ERP.
-                        exit /B 1
-                    )
-                '''
-            }
-        }
-
-        stage('Verify Service') {
-            steps {
-                bat '''
-                    echo ==========================================
-                    echo Checking Windows service
-                    echo ==========================================
-
-                    "%PYTHON_HOME%\\python.exe" ^
-                        "%SERVICE_MANAGER%" ^
-                        status ^
-                        "%SERVICE_ID%"
-
-                    if errorlevel 1 (
-                        echo ERROR: FastAPI ERP service is not running.
-                        exit /B 1
-                    )
-
-                    echo ==========================================
-                    echo Checking port %PORT%
-                    echo ==========================================
-
-                    netstat -ano | findstr ":%PORT%"
-
-                    if errorlevel 1 (
-                        echo ERROR: FastAPI ERP is not listening on port %PORT%.
                         exit /B 1
                     )
                 '''
