@@ -160,17 +160,17 @@ pipeline {
                         echo Configuring FastAPI ERP Windows service
                         echo ==========================================
 
-                        "%PYTHON_HOME%\python.exe" "%SERVICE_MANAGER%" install ^
-    "%SERVICE_ID%" ^
-    "%DEPLOY_DIR%" ^
-    --name "%SERVICE_NAME%" ^
-    --description "%SERVICE_DESCRIPTION%" ^
-    --depends-on Vault ^
-    --executable "%DEPLOY_DIR%\.venv\Scripts\uvicorn.exe" ^
-    --args "fastapi_erp:app --host 127.0.0.1 --port %PORT%" ^
-    --env "VAULT_ADDR=%VAULT_ADDR%" ^
-    --env "VAULT_PATH=%VAULT_PATH%" ^
-    --env "VAULT_TOKEN=%VAULT_TOKEN%"
+                        "%PYTHON_HOME%\\python.exe" "%SERVICE_MANAGER%" install ^
+                            "%SERVICE_ID%" ^
+                            "%DEPLOY_DIR%" ^
+                            --name "%SERVICE_NAME%" ^
+                            --description "%SERVICE_DESCRIPTION%" ^
+                            --depends-on Vault ^
+                            --executable "%DEPLOY_DIR%\\.venv\\Scripts\\uvicorn.exe" ^
+                            --args "fastapi_erp:app --host 127.0.0.1 --port %PORT%" ^
+                            --env "VAULT_ADDR=%VAULT_ADDR%" ^
+                            --env "VAULT_PATH=%VAULT_PATH%" ^
+                            --env "VAULT_TOKEN=%VAULT_TOKEN%"
 
                         if errorlevel 1 (
                             echo ERROR: Service configuration failed.
