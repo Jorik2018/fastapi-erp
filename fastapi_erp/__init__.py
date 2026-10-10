@@ -11,7 +11,8 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 app = FastAPI(
     title="ERP Details",
     description="You can perform CRUD operation by using this API",
-    version="1.0.0"
+    version="1.0.0",
+    root_path=os.getenv("BASE_PATH", "").rstrip("/")
 )
 
 #from fastapi_erp.database import DBMiddleware

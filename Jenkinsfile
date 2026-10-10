@@ -166,6 +166,7 @@ pipeline {
                             --depends-on Vault ^
                             --executable "%DEPLOY_DIR%\\.venv\\Scripts\\uvicorn.exe" ^
                             --args "fastapi_erp:app --host 127.0.0.1 --port %PORT%" ^
+                            --env "BASE_PATH=/api/uti" ^
                             --env "VAULT_ADDR=%VAULT_ADDR%" ^
                             --env "VAULT_PATH=%VAULT_PATH%" ^
                             --env "VAULT_TOKEN=%VAULT_TOKEN%"
