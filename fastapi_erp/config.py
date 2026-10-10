@@ -22,6 +22,12 @@ def get_database_url() -> str:
             "postgresql+psycopg://",
             1
         )
+    if database_url.startswith("mysql://"):
+        database_url = database_url.replace(
+            "mysql://",
+            "mysql+pymysql://",
+            1,
+        )
     return database_url
 
 
