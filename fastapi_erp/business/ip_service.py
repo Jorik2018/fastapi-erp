@@ -21,10 +21,6 @@ class IpService:
     def __init__(self, db: Session):
         self.db = db
 
-    # ---------------------------------------------------------
-    # Helpers
-    # ---------------------------------------------------------
-
     @staticmethod
     def _empty(value):
         if value is None:
@@ -50,14 +46,10 @@ class IpService:
 
         return f"%{value}%"
 
-    # ---------------------------------------------------------
-    # FIND / GET
-    # ---------------------------------------------------------
-
-    async def get(self, ip_id: int):
+    async def get(self, id: int):
         return (
             self.db.query(UtiIp)
-            .filter(UtiIp.id == ip_id)
+            .filter(UtiIp.id == id)
             .first()
         )
 
@@ -72,21 +64,42 @@ class IpService:
 
         return item
 
-    # ---------------------------------------------------------
-    # LOAD
-    # ---------------------------------------------------------
+    async def clear(self, id: int):
+        entity = await self.find(id)
 
+        if entity is not None:
+            entity.creation = None
+            entity.updated = None
+            entity.name = None
+            entity.position = None
+            entity.device_model = None
+            entity.patrimonial_code = None
+            entity.device_serie = None
+            entity.mac_id = None
+            entity.description = None
+
+        return entity
+    
     def load(
         self,
         first: int = 0,
         page_size: int = 100,
-        sort_field: str = None,
-        filters: dict = None,
+        sort_field: str | None = None,
+        filters: dict | None = None,
     ):
-        filters = filters or {}
+        #filters = filters or {}
+
+        # ---------------------------------------------------------
+        # FILTROS
+        # ---------------------------------------------------------
 
         general_filter = self._empty(filters.get("filter"))
+        user = self._empty(filters.get("user"))
+
+        # category es especial en Java:
+        # "" significa buscar category vacío/null.
         category = filters.get("category")
+
         code = self._empty(filters.get("code"))
         name = self._empty(filters.get("name"))
         mac_id = self._empty(filters.get("macId"))
@@ -94,9 +107,15 @@ class IpService:
         device = self._empty(filters.get("device"))
         siaf = self._empty(filters.get("siaf"))
         user_siaf = self._empty(filters.get("userSiaf"))
-        patrimonial_code = self._empty(filters.get("patrimonialCode"))
+        patrimonial_code = self._empty(
+            filters.get("patrimonialCode")
+        )
         description = self._empty(filters.get("description"))
         dependency = self._empty(filters.get("dependency"))
+
+        # Java lo obtiene, aunque en este método no termina
+        # participando en el WHERE.
+        empty = self._empty(filters.get("empty"))
 
         # ---------------------------------------------------------
         # QUERY BASE
@@ -148,9 +167,7 @@ class IpService:
             else:
                 query = query.filter(
                     func.upper(UtiIp.category).like(
-                        str(category)
-                        .upper()
-                        .replace(" ", "%")
+                        category.upper().replace(" ", "%")
                     )
                 )
 
@@ -180,13 +197,12 @@ class IpService:
                     func.upper(UtiIp.description).like(value),
                     func.upper(UtiIp.device).like(value),
 
-                    # Java: UPPER(t.name)
                     func.upper(DependencyType.name).like(value),
-
-                    # Java: UPPER(d.name)
                     func.upper(Dependency.name).like(value),
 
+                    # El Java original también hacía esto.
                     func.upper(UtiIp.stabilizer).like(value),
+
                     func.upper(UtiIp.stabilizer_code).like(value),
                     func.upper(UtiIp.stabilizer_description).like(value),
                     func.upper(UtiIp.printer_code).like(value),
@@ -273,7 +289,7 @@ class IpService:
         #
         # Java:
         #
-        # UPPER(CONCAT(t.name,d.name)) LIKE :dependency
+        # UPPER(CONCAT(t.name, d.name)) LIKE :dependency
         # ---------------------------------------------------------
 
         if dependency is not None:
@@ -297,8 +313,11 @@ class IpService:
         # ---------------------------------------------------------
         # TOTAL
         #
-        # Java solamente calcula size cuando pageSize > 0.
-        # Tiene que hacerse ANTES de offset/limit.
+        # Equivalente a:
+        #
+        # SELECT COUNT(o) + mismo WHERE
+        #
+        # Tiene que calcularse ANTES de offset/limit.
         # ---------------------------------------------------------
 
         if page_size > 0:
@@ -308,13 +327,8 @@ class IpService:
         # ORDER BY
         #
         # Java default:
-        # o.n3, o.n4, o.code DESC
         #
-        # SORTER:
-        # updated-ASC
-        # updated-DESC
-        # code-ASC
-        # code-DESC
+        # o.n3, n4, o.code DESC
         # ---------------------------------------------------------
 
         sorter = self._empty(
@@ -370,6 +384,10 @@ class IpService:
                 UtiIp.code.desc(),
             )
 
+        # ---------------------------------------------------------
+        # PAGINACIÓN
+        # ---------------------------------------------------------
+
         if page_size > 0:
             query = (
                 query
@@ -377,53 +395,65 @@ class IpService:
                 .limit(page_size)
             )
 
+        # ---------------------------------------------------------
+        # RESULTADO
+        #
+        # SQLAlchemy devuelve:
+        #
+        # Row(UtiIp, full_name)
+        #
+        # Java hacía:
+        #
+        # AbstractFacade.getColumn(
+        #     query.getResultList(),
+        #     RowAdapter
+        # )
+        #
+        # y terminaba devolviendo List<UtiIp>.
+        # ---------------------------------------------------------
+
         rows = query.all()
 
-        result = []
+        result: list[UtiIp] = []
 
         for item, full_name in rows:
             item.ext = {
-                "fullName": full_name
+                "fullName": full_name,
             }
 
             result.append(item)
 
-        return rows
-
+        return result
+    
     async def edit(self, entity: UtiIp, user=None):
-        if entity.code is not None:
-            parts = entity.code.split(".")
+        parts = entity.code.split(".")
 
-            if len(parts) != 4:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"El ip={entity.code} no es una direccion valida.",
-                )
+        if len(parts) != 4:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El ip={entity.code} no es una direccion valida.",
+            )
 
-            try:
-                octets = [int(value) for value in parts]
-            except ValueError:
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"El ip={entity.code} no es una direccion valida.",
-                )
+        try:
+            octets = [int(value) for value in parts]
+        except ValueError:
+            raise HTTPException(
+                status_code=400,
+                detail=f"El ip={entity.code} no es una direccion valida.",
+            )
 
-            # El Java original solamente parseaba los números.
-            # Aprovechamos para validar realmente IPv4.
-            if any(value < 0 or value > 255 for value in octets):
-                raise HTTPException(
-                    status_code=400,
-                    detail=f"El ip={entity.code} no es una direccion valida.",
-                )
+        # El Java original solamente parseaba los números.
+        # Aprovechamos para validar realmente IPv4.
+        if any(value < 0 or value > 255 for value in octets):
+            raise HTTPException(
+                status_code=400,
+                detail=f"El ip={entity.code} no es una direccion valida.",
+            )
 
-            entity.code = ".".join(str(value) for value in octets)
+        entity.code = ".".join(str(value) for value in octets)
 
-            entity.n3 = octets[2]
-            entity.n4 = octets[3]
-
-        # -----------------------------------------------------
-        # IP duplicada
-        # -----------------------------------------------------
+        entity.n3 = octets[2]
+        entity.n4 = octets[3]
 
         if not entity.canceled:
             query = (
@@ -434,6 +464,7 @@ class IpService:
                 )
             )
 
+            print(entity)
             if entity.id is not None:
                 query = query.filter(
                     UtiIp.id != entity.id
@@ -466,15 +497,12 @@ class IpService:
 
         if entity.id is None:
             self.db.add(entity)
+            self.db.flush()
         else:
             entity.updated = now
-            self.db.merge(entity)
+            entity = self.db.merge(entity)
 
         return entity
-
-    # ---------------------------------------------------------
-    # UPDATE según patrón ItemService
-    # ---------------------------------------------------------
 
     async def update(
         self,
@@ -493,10 +521,6 @@ class IpService:
         set_fields_from_dict(entity, new_item)
 
         return await self.edit(entity, user=user)
-
-    # ---------------------------------------------------------
-    # CATEGORY LIST
-    # ---------------------------------------------------------
 
     def get_category_list(self):
         rows = (
@@ -531,20 +555,3 @@ class IpService:
         )
 
         return result
-
-    # ---------------------------------------------------------
-    # LIMPIAR
-    # ---------------------------------------------------------
-
-    def limpiar(self, entity: UtiIp):
-        entity.creation = None
-        entity.updated = None
-        entity.name = None
-        entity.position = None
-        entity.device_model = None
-        entity.patrimonial_code = None
-        entity.device_serie = None
-        entity.mac_id = None
-        entity.description = None
-
-        return entity

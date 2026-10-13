@@ -67,6 +67,7 @@ def _cbv(router: APIRouter, cls: Type[T]) -> Type[T]:
             route
         )
 
+        route.response_model_exclude_none = True
         cbv_router.routes.append(route)
 
     router.include_router(cbv_router)

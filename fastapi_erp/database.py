@@ -1,3 +1,4 @@
+import os
 import traceback
 
 from fastapi import HTTPException, Request
@@ -37,21 +38,30 @@ class DBMiddleware(BaseHTTPMiddleware):
         try:
             response = await call_next(request)
 
-        except HTTPException as http_exc:
-            response = http_exc
+            if hasattr(request.state, "db") and request.state.db:
+                request.state.db.commit()
+
+            return response
+
+        except HTTPException:
+            if hasattr(request.state, "db") and request.state.db:
+                request.state.db.rollback()
+            raise
 
         except Exception:
+            if hasattr(request.state, "db") and request.state.db:
+                request.state.db.rollback()
+
             traceback.print_exc()
-            response = JSONResponse(
+
+            return JSONResponse(
                 status_code=500,
                 content={"message": "Server error"}
             )
 
-        if hasattr(request.state, "db") and request.state.db:
-            close(request.state.db)
-
-        return response
-
+        finally:
+            if hasattr(request.state, "db") and request.state.db:
+                request.state.db.close()
 
 def set_fields_from_dict(obj, data: dict):
     for key, value in data.items():
@@ -70,7 +80,8 @@ def get_sessionmaker():
 
         __engine = create_engine(database_url)
 
-        #Base.metadata.create_all(bind=__engine)
+        if os.getenv("MOCK_VAULT", "false").lower() == "true":
+            Base.metadata.create_all(bind=__engine)
 
         __sessionmaker = sessionmaker(
             autocommit=False,

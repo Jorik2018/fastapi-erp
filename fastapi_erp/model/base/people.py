@@ -9,10 +9,10 @@ class People(Base):
     id = Column(
         "id_dir",
         Integer,
-        primary_key=True
+        primary_key=True,
     )
 
     full_name = Column(
         "nombre_completo",
-        String
+        String(255),
     )

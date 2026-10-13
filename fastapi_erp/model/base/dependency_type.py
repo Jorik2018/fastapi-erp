@@ -9,10 +9,10 @@ class DependencyType(Base):
     id = Column(
         "id_dep_tipo",
         Integer,
-        primary_key=True
+        primary_key=True,
     )
 
     name = Column(
         "nombre",
-        String
+        String(255),
     )

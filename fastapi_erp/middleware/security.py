@@ -25,7 +25,6 @@ class JWTMiddleware(BaseHTTPMiddleware):
 
         if (
             os.getenv("MOCK_VAULT", "false").lower() == "true"
-            and path == "/v1/secret/data/global"
         ):
             return await call_next(request)
 

@@ -7,11 +7,19 @@ from fastapi import (
 
 from fastapi_erp.business.ip_service import IpService
 from fastapi_erp.cbv import cbv
+
+# Entidad SQLAlchemy
+from fastapi_erp.model.base.ip import UtiIp
+
+# DTOs Pydantic
 from fastapi_erp.model.api.ip import (
-    UtiIp,
     UtiIpCreate,
+    UtiIpResponse,
     UtiIpUpdate,
 )
+
+# Mapper DTO -> Entity
+from fastapi_erp.utils.mapper import ListResponse, to_entity
 
 
 router = APIRouter(
@@ -25,22 +33,43 @@ class IpController:
 
     ip_service: IpService = Depends(IpService.instance)
 
-    # ---------------------------------------------------------
-    # CREATE
-    # ---------------------------------------------------------
 
-    @router.post("", response_model=UtiIp)
+    @router.get(
+        "/{ip_id}",
+        response_model=UtiIpResponse,
+    )
+    async def get(
+        self,
+        ip_id: int,
+    ):
+        result = await self.ip_service.get(ip_id)
+
+        if result is None:
+            raise HTTPException(
+                status_code=404,
+                detail="IP not found",
+            )
+
+        return result
+
+
+    @router.get(
+        "/prepare",
+        response_model=UtiIpResponse,
+    )
+    async def prepare(self):
+        return await self.ip_service.prepare()
+
+    @router.post("", response_model=UtiIpResponse)
     async def create(
         self,
-        entity: UtiIpCreate,
+        dto: UtiIpCreate,
     ):
-        return await self.ip_service.create(entity)
+        return await self.ip_service.edit(
+            to_entity(dto, UtiIp)
+        )
 
-    # ---------------------------------------------------------
-    # UPDATE
-    # ---------------------------------------------------------
-
-    @router.put("/{ip_id}", response_model=UtiIp)
+    @router.put("/{ip_id}", response_model=UtiIpResponse)
     async def update(
         self,
         ip_id: int,
@@ -59,24 +88,16 @@ class IpController:
 
         return result
 
-    # ---------------------------------------------------------
-    # DISABLE
-    # ---------------------------------------------------------
-
     @router.post("/disable")
     async def disable(
         self,
         ids: list[int],
     ):
-        await self.ip_service.disable(ids)
+        self.ip_service.disable(ids)
 
         return {
             "message": "IP records disabled successfully"
         }
-
-    # ---------------------------------------------------------
-    # DELETE
-    # ---------------------------------------------------------
 
     @router.delete("/{ip_id}")
     async def delete(
@@ -95,10 +116,6 @@ class IpController:
             "message": "IP deleted successfully"
         }
 
-    # ---------------------------------------------------------
-    # FINISH
-    # ---------------------------------------------------------
-
     @router.post("/{ip_id}/finish")
     async def finish(
         self,
@@ -116,21 +133,6 @@ class IpController:
             "message": "IP finished successfully"
         }
 
-    # ---------------------------------------------------------
-    # PREPARE
-    # ---------------------------------------------------------
-
-    @router.get(
-        "/prepare",
-        response_model=UtiIp,
-    )
-    async def prepare(self):
-        return await self.ip_service.prepare()
-
-    # ---------------------------------------------------------
-    # CATEGORIES
-    # ---------------------------------------------------------
-
     @router.get("/category")
     async def category(self):
 
@@ -146,16 +148,12 @@ class IpController:
             for category in categories
         ]
 
-    # ---------------------------------------------------------
-    # CLEAN
-    # ---------------------------------------------------------
-
-    @router.put("/limpiar/{ip_id}")
+    @router.put("/clear/{id}")
     async def clean(
         self,
-        ip_id: int,
+        id: int,
     ):
-        result = await self.ip_service.clean(ip_id)
+        result = await self.ip_service.clear(id)
 
         if not result:
             raise HTTPException(
@@ -167,10 +165,6 @@ class IpController:
             "message": "IP cleaned successfully"
         }
 
-    # ---------------------------------------------------------
-    # COUNT
-    # ---------------------------------------------------------
-
     @router.get("/count")
     async def count(self):
         return await self.ip_service.count()
@@ -179,29 +173,8 @@ class IpController:
     # GET
     # ---------------------------------------------------------
 
-    @router.get(
-        "/{ip_id}",
-        response_model=UtiIp,
-    )
-    async def get(
-        self,
-        ip_id: int,
-    ):
-        result = await self.ip_service.get(ip_id)
-
-        if result is None:
-            raise HTTPException(
-                status_code=404,
-                detail="IP not found",
-            )
-
-        return result
-
-    # ---------------------------------------------------------
-    # LIST
-    # ---------------------------------------------------------
-
-    @router.get("/{skip}/{limit}")
+    @router.get("/{skip}/{limit}",
+                response_model=ListResponse[UtiIpResponse])
     async def list(
         self,
         skip: int = 0,
