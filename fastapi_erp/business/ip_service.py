@@ -534,6 +534,7 @@ class IpService:
     def get_category_list(self):
         rows = (
             self.db.query(UtiIp.category)
+            .filter(UtiIp.canceled == 0)
             .distinct()
             .order_by(UtiIp.category)
             .all()
