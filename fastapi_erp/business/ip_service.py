@@ -155,6 +155,12 @@ class IpService:
         # ---------------------------------------------------------
 
         if category is not None:
+            # Acepta una lista o una cadena separada por comas.
+            if isinstance(category, (list, tuple)):
+                values = category
+            else:
+                values = str(category).split(",")
+
             categories = [
                 str(value).strip().upper()
                 for value in values
@@ -162,6 +168,7 @@ class IpService:
             ]
 
             print("Categorías normalizadas:", categories)
+
             if not categories:
                 query = query.filter(
                     or_(
@@ -173,7 +180,6 @@ class IpService:
                 query = query.filter(
                     func.upper(func.trim(UtiIp.category)).in_(categories)
                 )
-
 
         # ---------------------------------------------------------
         # FILTRO GENERAL
