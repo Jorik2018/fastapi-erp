@@ -33,6 +33,21 @@ class IpController:
 
     ip_service: IpService = Depends(IpService.instance)
 
+    @router.get("/category")
+    async def category(self):
+
+        categories = (
+            await self.ip_service.get_category_list()
+        )
+
+        return [
+            {
+                "id": category,
+                "name": category,
+            }
+            for category in categories
+        ]
+
 
     @router.get(
         "/{ip_id}",
@@ -133,20 +148,6 @@ class IpController:
             "message": "IP finished successfully"
         }
 
-    @router.get("/category")
-    async def category(self):
-
-        categories = (
-            await self.ip_service.get_category_list()
-        )
-
-        return [
-            {
-                "id": category,
-                "name": category,
-            }
-            for category in categories
-        ]
 
     @router.put("/clear/{id}")
     async def clean(
