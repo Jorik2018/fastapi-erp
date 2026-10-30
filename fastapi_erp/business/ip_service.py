@@ -419,7 +419,6 @@ class IpService:
         for item, full_name in rows:
             item.ext = {
                 "fullName": full_name,
-                "XX":99
             }
             result.append(item)
 
