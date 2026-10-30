@@ -173,7 +173,8 @@ class IpService:
                     or_(
                         *[
                             func.upper(UtiIp.category).like(
-                                f"%{value.upper().replace(' ', '%')}%"
+                                f"{value.upper()}"
+                                #f"%{value.upper().replace(' ', '%')}%"
                             )
                             for value in categories
                         ]
