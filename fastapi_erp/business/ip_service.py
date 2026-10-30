@@ -155,9 +155,13 @@ class IpService:
         # ---------------------------------------------------------
 
         if category is not None:
-            category = str(category).strip()
+            categories = [
+                value.strip()
+                for value in str(category).split(",")
+                if value.strip()
+            ]
 
-            if category == "":
+            if not categories:
                 query = query.filter(
                     or_(
                         func.trim(UtiIp.category) == "",
@@ -166,10 +170,16 @@ class IpService:
                 )
             else:
                 query = query.filter(
-                    func.upper(UtiIp.category).like(
-                        category.upper().replace(" ", "%")
+                    or_(
+                        *[
+                            func.upper(UtiIp.category).like(
+                                f"%{value.upper().replace(' ', '%')}%"
+                            )
+                            for value in categories
+                        ]
                     )
                 )
+
 
         # ---------------------------------------------------------
         # FILTRO GENERAL
