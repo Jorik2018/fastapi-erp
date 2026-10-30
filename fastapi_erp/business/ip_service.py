@@ -170,15 +170,16 @@ class IpService:
                 )
             else:
                 query = query.filter(
-                    or_(
-                        *[
-                            func.upper(UtiIp.category).like(
-                                f"{value.upper()}"
-                                #f"%{value.upper().replace(' ', '%')}%"
-                            )
-                            for value in categories
-                        ]
-                    )
+                    func.upper(func.trim(UtiIp.category)).in_(categories)
+                    # or_(
+                    #     *[
+                    #         func.upper(UtiIp.category).like(
+                    #             f"{value.upper()}"
+                    #             #f"%{value.upper().replace(' ', '%')}%"
+                    #         )
+                    #         for value in categories
+                    #     ]
+                    # )
                 )
 
 
