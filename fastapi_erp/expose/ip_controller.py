@@ -35,10 +35,7 @@ class IpController:
 
     @router.get("/category")
     async def category(self):
-
-        categories = (
-            await self.ip_service.get_category_list()
-        )
+        categories = self.ip_service.get_category_list()
 
         return [
             {
