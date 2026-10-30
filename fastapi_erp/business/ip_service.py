@@ -156,9 +156,9 @@ class IpService:
 
         if category is not None:
             categories = [
-                value.strip()
-                for value in str(category).split(",")
-                if value.strip()
+                str(value).strip().upper()
+                for value in values
+                if value is not None and str(value).strip()
             ]
 
             print("Categorías normalizadas:", categories)
