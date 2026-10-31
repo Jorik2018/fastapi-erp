@@ -4,7 +4,9 @@ from fastapi import (
     HTTPException,
     Query,
 )
+from fastapi.responses import Response
 
+from fastapi_erp.utils.ip_excel import generate_ip_excel
 from fastapi_erp.business.ip_service import IpService
 from fastapi_erp.cbv import cbv
 
@@ -223,3 +225,26 @@ class IpController:
             **params,
             "data": data,
         }
+
+
+    @router.post("/download")
+    def download(self):
+        items = self.ip_service.load(
+            first=0,
+            page_size=0,
+            sort_field=None,
+            filters={},
+        )
+
+        excel_content = generate_ip_excel(items)
+
+        return Response(
+            content=excel_content,
+            media_type=(
+                "application/vnd.openxmlformats-officedocument"
+                ".spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": 'attachment; filename="repor.xlsx"',
+            },
+        )

@@ -20,6 +20,7 @@ requests = "^2.34.2"
 psycopg = {extras = ["binary"], version = "^3.3.6"}
 pyjwt = {extras = ["crypto"], version = "^2.15.1"}
 pymysql = "^1.2.3"
+openpyxl = "^3.1.5"
 
 [build-system]
 requires = ["poetry-core"]
