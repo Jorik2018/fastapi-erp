@@ -207,8 +207,13 @@ class IpService:
                     func.upper(UtiIp.description).like(value),
                     func.upper(UtiIp.device).like(value),
 
-                    func.upper(DependencyType.name).like(value),
-                    func.upper(Dependency.name).like(value),
+
+          
+
+
+
+                    #func.upper(DependencyType.name).like(value),
+                    #func.upper(Dependency.name).like(value),
 
                     # El Java original también hacía esto.
                     func.upper(UtiIp.stabilizer).like(value),
